@@ -1,6 +1,6 @@
 import sqlite from 'sqlite3'
 
-//export.initDatabase
+//exports.initDatabase
 export function initDatabase() {
   return new sqlite.Database('data', (err) => {
     if (err) {
@@ -10,9 +10,8 @@ export function initDatabase() {
   })
 }
 
-
 /**
- * init table database
+ * init table from database
  * @param {sqlite.Database} db 
  */
 export function initTable(db) {
@@ -23,44 +22,37 @@ export function initTable(db) {
       name VARCHAR(56) NOT NULL,
       price INTEGER NOT NULL
     );`)
-  })  
+  })
 }
-
 
 /**
  * 
- * @param {sqlite.Database} db
+ * @param {sqlite.Database} db 
  * @param {string} name 
  * @param {number} price 
  * @param {string} photo 
  */
-
-export function insertProduct(dbConnection, name, price, photo) {
-  dbConnection.query('INSERT INTO product SET ?', { name, price, photo }, (err) => {
-    if(err) {
-      console.log(err)
 export function insertProduct(db, name, price, photo) {
-  db.run('INSERT INTO product ($photo,$name,$price) VALUES ($photo,$name,$price)', { $photo: photo, $name: name, $price: price }, (err) => {
+  db.run('INSERT INTO product (photo,name,price) VALUES ($photo,$name,$price)', { $photo: photo, $name: name, $price: price }, (err) => {
     if (err) {
       throw err
     }
-
     console.log('product saved')
   })
 }
-
 
 /**
  * 
  * @param {sqlite.Database} db 
  */
 export function getProduct(db) {
-  db.get('SELECT * FROM product', (err, result) => {
-    if(err) {
-      console.log(err)
-      throw err
-    }
-    console.log(result)
-    return result
+  return new Promise((resolve, reject) => {
+    db.all('SELECT * FROM product', (err, result) => {
+      if(err) {
+        reject(err)
+      }
+      console.log('Query result', result)
+      resolve(result)
+    })
   })
 }
